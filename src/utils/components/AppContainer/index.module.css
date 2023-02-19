@@ -1,0 +1,14 @@
+.main-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.app-container {
+  min-width: 500px; /* /TODO WILL DELETE/ */
+  width: fit-content;
+  flex: 1;
+  height: 100%;
+  display: flex;
+  justify-content: flex-start;
+}

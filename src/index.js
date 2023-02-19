@@ -3,12 +3,27 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import axios from 'axios';
+
+// axios.interceptors.request.use ((request) => {
+//     console.log ('req.status')
+//     return request
+//   })
+
+axios.interceptors.response.use(
+    response => response,
+    error => {
+      if (error.response.status === 401) {
+        window.location.href = '/';
+      } else if (error.response.status === 403) {
+        console.log ('crazy')
+        localStorage.removeItem('jwt')
+      }
+    });
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
     <App />
-  </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

@@ -1,0 +1,24 @@
+.menu-item {
+  background-color: #81E5D3;
+  color: #369CC0;
+  padding: 3rem;
+  margin: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 40px;
+  font-size: 50px;
+  font-weight: bold;
+  font-family: 'Quicksand', sans-serif;
+}
+.menu-item:hover {
+  cursor: pointer;
+}
+
+.main-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+}
