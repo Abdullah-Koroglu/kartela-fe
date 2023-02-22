@@ -3,15 +3,13 @@ import React , {useState, createContext} from "react";
 export const StateContext = createContext ();
 
 export const StateProvider = ({children}) => {
-  const [authData, setAuthData] = useState ();
-  const [sessionKey, setSessionKey] = useState ();
+  const [headerContent, setHeaderContent] = useState ();
 
   return (
     <StateContext.Provider
       value={
         {
-          authData, setAuthData,
-          sessionKey, setSessionKey
+          headerContent, setHeaderContent,
         }
       }
     >

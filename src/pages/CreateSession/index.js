@@ -1,16 +1,19 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Formik, Form, Field } from "formik";
 import CSS from "./index.module.css"
 import Modal from "../../utils/components/Modal";
 import UserCreateForm from "../../utils/components/uncommon/UserCreateForm";
+import {IoArrowBackCircleOutline} from "react-icons/io5"
 
 
 import { AiOutlineUserAdd } from 'react-icons/ai'
 import { DatePickerField } from "../../utils/components/FormikDatePicker";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { StateContext } from "../../utils/context/StateContext";
 
 function CreateSession() {
+  const {setHeaderContent} = useContext (StateContext)
   const navigate = useNavigate ()
   const [rooms, setRooms] = useState ()
   const [startDate, setStartDate] = useState ()
@@ -47,6 +50,12 @@ function CreateSession() {
 
   useEffect (() => {
     getFormData ()
+    setHeaderContent (
+      <>
+        <a href="/"><IoArrowBackCircleOutline size={'3rem'} className={CSS["go-back-icon"]}/></a>
+        <h2 className={CSS["page-header"]}>Seans Ekle</h2>
+      </>
+    )
   }, [])
 
   const handleCloseModal = (e) => {
