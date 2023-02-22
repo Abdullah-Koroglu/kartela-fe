@@ -11,15 +11,16 @@ import axios from 'axios';
 //   })
 
 axios.interceptors.response.use(
-    response => response,
+    response => response.data,
     error => {
       if (error.response.status === 401) {
         window.location.href = '/';
       } else if (error.response.status === 403) {
-        console.log ('crazy')
         localStorage.removeItem('jwt')
+        localStorage.removeItem('user')
+        axios.defaults.headers.common['Authorization'] = null;
       }
-    });
+});
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

@@ -16,10 +16,10 @@ function Login() {
         password: Password
       })
 
-      if (response.data?.jwt) {
-        localStorage.setItem("user", JSON.stringify(response.data?.user))
-        localStorage.setItem("jwt", response.data?.jwt)
-        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.jwt}`;
+      if (response?.jwt) {
+        localStorage.setItem("user", JSON.stringify(response?.user))
+        localStorage.setItem("jwt", response?.jwt)
+        axios.defaults.headers.common['Authorization'] = `Bearer ${response.jwt}`;
         navigate ('/')
       } else {
         toast.error ('error')

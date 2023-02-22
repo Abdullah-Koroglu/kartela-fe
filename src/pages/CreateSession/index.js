@@ -21,21 +21,23 @@ function CreateSession() {
     const rooms = await axios.get ('rooms')
     const clients = await axios.get ('clients')
 
-    setRooms (rooms.data.data)
-    setClients (clients.data.data)
+    setRooms (rooms.data)
+    setClients (clients.data)
   }
 
   const submitSession = async ({client,room,startTime,endTime}) => {
     try {
       // TODO check the room if available or not before submitting
+      const user = JSON.parse(localStorage.getItem ('user'))
       const response = await axios.post('sessions', {data: {
         client,
         room,
         start_time: startTime,
-        end_time: endTime
+        end_time: endTime,
+        therapist_id: user.id
       }})
 
-      if (response.data) navigate ('/my_sessions')
+      if (response) navigate ('/my_sessions')
 
     } catch (error) {
       // toast.error (error?.message ?? 'error')

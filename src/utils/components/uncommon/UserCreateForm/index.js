@@ -21,7 +21,7 @@ function UserForm({done}) {
         birth_date: birthDate
       }})
 
-      if (response.data) done ()
+      if (response) done ()
 
     } catch (error) {
       // toast.error (error?.message ?? 'error')

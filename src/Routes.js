@@ -18,6 +18,7 @@ export default function Router() {
                   <Route exact path="/" element={<Home/>}/>
                   <Route path="/session_list" element={<SessionList/>}/>
                   <Route path="/create_session" element={<CreateSession/>}/>
+                  <Route path="/my_sessions" element={<SessionList/>}/>
               </Route>
           </Routes>
       </BrowserRouter>
