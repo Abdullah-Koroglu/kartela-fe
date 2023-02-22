@@ -20,6 +20,7 @@ axios.interceptors.response.use(
         localStorage.removeItem('user')
         axios.defaults.headers.common['Authorization'] = null;
       }
+      return error.response.data
 });
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

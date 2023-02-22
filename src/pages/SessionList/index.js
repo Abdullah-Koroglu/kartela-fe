@@ -68,7 +68,7 @@ function SessionList() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const getSessions = async () => {
-    const sessions = await axios.get ('sessions?filters[therapist_id][$eq]=1&populate=*')
+    const sessions = await axios.get ('sessions?filters?populate=*')
 
     sessions.data.map ((session) => {
       const sessionData = session.attributes
