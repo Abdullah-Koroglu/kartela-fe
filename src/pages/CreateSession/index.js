@@ -12,13 +12,16 @@ import { DatePickerField } from "../../utils/components/FormikDatePicker";
 import { Link, useNavigate } from "react-router-dom";
 import { StateContext } from "../../utils/context/StateContext";
 import { toast } from "react-toastify";
+import Calendar from "../../utils/components/Calendar";
+
 
 function CreateSession() {
   const {setHeaderContent} = useContext (StateContext)
   const navigate = useNavigate ()
   const [rooms, setRooms] = useState ()
   const [startDate, setStartDate] = useState ()
-  const [endDate, setEndDate] = useState ()
+  const [duration, setDuration] = useState (0)
+  const [price, setPrice] = useState (0)
   const [clients, setClients] = useState ()
   const [modalOpen, setModalOpen] = useState ()
   const getFormData = async () => {
@@ -29,18 +32,24 @@ function CreateSession() {
     setClients (clients.data)
   }
 
-  const submitSession = async ({client,room,startTime,endTime}) => {
+  const submitSession = async ({client,room,startTime,duration, price}) => {
     try {
-      // TODO check the room if available or not before submitting
+      const endTime = new Date(startTime.getTime () + (duration * 60000)).getTime ()
+
       const response = await axios.post('sessions/check_and_create', {data: {
         client,
         room,
-        start_time: startTime,
+        start_time: startTime.getTime (),
         end_time: endTime,
+        price
       }})
       // console.log (response)
       if (response?.error){
         toast.error (response.error?.message ?? 'error')
+        return
+      }
+      if (response?.message){
+        toast.error (response.message ?? 'error')
         return
       }
       if (response) {
@@ -48,7 +57,7 @@ function CreateSession() {
         navigate ('/my_sessions')}
 
     } catch (error) {
-      console.log ({nabner:error})
+      console.log ({error})
     }
   }
 
@@ -77,9 +86,6 @@ function CreateSession() {
       // validationSchema={FormSchema}
       onSubmit={(values) => {
         submitSession (values)
-        // console.log (values)
-        // const {customerId, password} = values
-        // login (customerId, password)
       }}
     >
       {({ errors }) => (
@@ -123,18 +129,25 @@ function CreateSession() {
           </div>
           <div className={`${CSS["text-field"]} ${CSS["form-element"]}`}>
             <label>
-              Bitiş
+              Süre (dakika)
             </label>
-            <DatePickerField
+              <Field type="number" name="duration" className={CSS["form-field"]} />
+            {/* <DatePickerField
                 // autoComplete="off"
-                name="endTime"
-                className={CSS["form-field"]}
+
                 selected={endDate}
                 onChange={(date) => setEndDate (date)}
                 showTimeInput
                 dateFormat='dd/MM/yyyy HH:mm'
                 // timeClassName={handleColor}
-              />
+              /> */}
+            {/* {errors.password && <p>{errors.password}</p>} */}
+          </div>
+          <div className={`${CSS["text-field"]} ${CSS["form-element"]}`}>
+            <label>
+              Ücret (₺)
+            </label>
+              <Field  type="number" name="price" className={CSS["form-field"]} />
             {/* {errors.password && <p>{errors.password}</p>} */}
           </div>
           {/* <div className={CSS["form-element"]}>
@@ -151,7 +164,7 @@ function CreateSession() {
     </Formik>
 
     </div>
-    <div className={CSS["calendar-container"]}>Takvim</div>
+    <div className={CSS["calendar-container"]}>{Calendar ()}</div>
   </div>;
 }
 
