@@ -102,7 +102,7 @@ function CreateSession() {
             <div className={CSS["row"]}>
               <Field className={CSS["form-field"]} as="select" name="client">
                 <option value={-1}>Seçiniz</option>
-                {clients?.map (client => <option value={client.id}>{client.attributes.name}</option>)}
+                {clients?.map (client => <option key={client.id} value={client.id}>{client.attributes.name}</option>)}
               </Field>
               <AiOutlineUserAdd onClick={() => {setModalOpen (true)}} size={'1.5rem'} className={CSS["add-user-icon"]}/>
             </div>
@@ -113,7 +113,7 @@ function CreateSession() {
             </label>
             <Field className={CSS["form-field"]} as="select" name="room">
                 <option value={-1}>Seçiniz</option>
-                {rooms?.map (room => <option value={room.id}>{room.attributes.name}</option>)}
+                {rooms?.map (room => <option key={room.id} value={room.id}>{room.attributes.name}</option>)}
             </Field>
           </div>
           <div className={`${CSS["text-field"]} ${CSS["form-element"]}`}>
@@ -161,7 +161,7 @@ function CreateSession() {
             </label>
             <Field className={CSS["form-field"]} as="select" name="session_type">
                 <option value={-1}>Seçiniz</option>
-                {sessionTypes?.map (type => <option value={type.id}>{type.attributes.name}</option>)}
+                {sessionTypes?.map (type => <option key={type.id} value={type.id}>{type.attributes.name}</option>)}
             </Field>
           </div>
           <button className={CSS["form-submit"]} type="submit">KAYDET</button>

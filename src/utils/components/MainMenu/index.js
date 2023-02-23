@@ -12,11 +12,11 @@ function Menu() {
   const navigate = useNavigate ()
   return <div className={CSS["main-container"]}>
     {menuArr.map ((item) =>  <div
-    key={item.slug}
-    onClick={() => {navigate (`/${item.slug}`)}}
-    className={CSS['menu-item']}>
+      key={item.slug}
+      onClick={() => {navigate (`/${item.slug}`)}}
+      className={CSS['menu-item']}>
         {item.displayName}
-    </div>)}
+      </div>)}
   </div>;
 }
 

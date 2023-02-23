@@ -50,7 +50,7 @@ const Calendar = () => {
           return <div key={key} style={{backgroundColor: key}} className={CSS["room-container"]}>
             {
               Object.keys(room).map(day => {
-                return <div className={CSS["day-container"]}>
+                return <div key={day} className={CSS["day-container"]}>
                     <span className={CSS["day-name"]}>{day}:</span>
                     <span className={CSS["program-container"]}>
                     {room[day].map(session => {

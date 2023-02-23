@@ -57,7 +57,7 @@ function UserForm({done}) {
                 Cinsiyet
               </label>
               <Field className={CSS["form-field"]} as="select" name="gender">
-                  {genders?.map (gender => <option value={gender.value}>{gender.value}</option>)}
+                  {genders?.map (gender => <option key={gender.value} value={gender.value}>{gender.value}</option>)}
               </Field>
             </div>
             <div className={`${CSS["text-field"]} ${CSS["form-element"]}`}>

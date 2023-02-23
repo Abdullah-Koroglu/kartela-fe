@@ -176,28 +176,28 @@ function SessionList() {
         <span className={CSS["filter-header"]}>Danışan : </span>
         <select value={filterData.client} onChange={(e) => {setFilterData ((past) => {return {...past, client: e.target.value}})}} className={CSS["filter-select"]}>
           <option value={-1}>Seçiniz..</option>
-          {clients.map (client => <option value={client.id}>{client.attributes.name}</option>)}
+          {clients.map (client => <option key={client.id} value={client.id}>{client.attributes.name}</option>)}
         </select>
       </div>
       <div className={CSS["filter-element"]}>
         <span className={CSS["filter-header"]}>Oda : </span>
         <select value={filterData.room} onChange={(e) => {setFilterData ((past) => {return {...past, room: e.target.value}})}} className={CSS["filter-select"]}>
           <option value={-1}>Seçiniz..</option>
-          {rooms.map (room => <option value={room.id}>{room.attributes.name}</option>)}
+          {rooms.map (room => <option key={room.id} value={room.id}>{room.attributes.name}</option>)}
         </select>
       </div>
       <div className={CSS["filter-element"]}>
         <span className={CSS["filter-header"]}>Ödendi mi? : </span>
         <select value={filterData.is_paid} onChange={(e) => {setFilterData ((past) => {return {...past, is_paid: e.target.value}})}} className={CSS["filter-select"]}>
           <option value={-1}>Seçiniz..</option>
-          {boolSelect.map (bool => <option value={bool.value}>{bool.label}</option>)}
+          {boolSelect.map (bool => <option key={bool.value} value={bool.value}>{bool.label}</option>)}
         </select>
       </div>
       <div className={CSS["filter-element"]}>
         <span className={CSS["filter-header"]}>Tamamlandı mı? : </span>
         <select value={filterData.is_completed} onChange={(e) => {setFilterData ((past) => {return {...past, is_completed: e.target.value}})}} className={CSS["filter-select"]}>
           <option value={-1}>Seçiniz..</option>
-          {boolSelect.map (bool => <option value={bool.value}>{bool.label}</option>)}
+          {boolSelect.map (bool => <option key={bool.value} value={bool.value}>{bool.label}</option>)}
         </select>
       </div>
 
