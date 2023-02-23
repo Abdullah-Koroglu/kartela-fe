@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React from "react";
 import Router from "./Routes";
 import axios from 'axios';
 import { StateProvider } from "./utils/context/StateContext";

@@ -164,7 +164,7 @@ function SessionList() {
         <h2 className={CSS["page-header"]}>Seanslarım</h2>
       </>
     )
-  },[])
+  },[setHeaderContent])
 
   useEffect (() => {
     getSessions ()

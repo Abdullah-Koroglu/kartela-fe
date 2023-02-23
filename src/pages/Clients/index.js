@@ -86,7 +86,7 @@ const Clients = () => {
         <h2 className={CSS["page-header"]}>Danışanlarım</h2>
       </>
     )
-  },[])
+  },[setHeaderContent])
 
   return <div className={CSS["main-container"]}>
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>

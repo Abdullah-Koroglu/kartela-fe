@@ -21,8 +21,7 @@ const Calendar = () => {
     const ordered = groupBy (sessions.data , ({attributes}) => attributes.room.data.attributes.color)
     let newObj = {}
     Object.keys(ordered).map (key => {
-
-      newObj[key] = groupBy (ordered[key], function ({attributes}) {
+      return newObj[key] = groupBy (ordered[key], function ({attributes}) {
         return moment(attributes.start_time).startOf('day').format('dddd');
       })
     })

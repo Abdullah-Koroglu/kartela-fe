@@ -9,7 +9,7 @@ import {IoArrowBackCircleOutline} from "react-icons/io5"
 
 import { AiOutlineUserAdd } from 'react-icons/ai'
 import { DatePickerField } from "../../utils/components/FormikDatePicker";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { StateContext } from "../../utils/context/StateContext";
 import { toast } from "react-toastify";
 import Calendar from "../../utils/components/Calendar";
@@ -74,7 +74,7 @@ function CreateSession() {
         <h2 className={CSS["page-header"]}>Seans Ekle</h2>
       </>
     )
-  }, [])
+  }, [setHeaderContent])
 
   const handleCloseModal = (e) => {
     setModalOpen (e); getFormData ()

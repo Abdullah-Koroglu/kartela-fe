@@ -1,5 +1,3 @@
-import { useContext } from "react";
-import { StateContext } from "../../context/StateContext";
 import Header from "../Header";
 import CSS from "./index.module.css"
 

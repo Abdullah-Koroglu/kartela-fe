@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import CSS from "./index.module.css"
 
 function Modal({children, open, setOpenFromParent}) {
-  const handleOpen = (open) => {
-    setOpen (open)
-    setOpenFromParent (open)
-  }
+  // const handleOpen = (open) => {
+  //   setOpen (open)
+  //   setOpenFromParent (open)
+  // }
   const [isOpen, setOpen] = useState (open)
   useEffect (() => {
     setOpen (open)

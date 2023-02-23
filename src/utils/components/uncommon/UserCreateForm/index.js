@@ -1,7 +1,6 @@
 import { Formik, Field, Form } from "formik";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import CSS from "./index.module.css"
-import DatePicker, {registerLocale} from "react-datepicker";
 import axios from "axios";
 import { DatePickerField } from "../../FormikDatePicker";
 
