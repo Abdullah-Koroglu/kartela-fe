@@ -13,12 +13,15 @@ function UserForm({done}) {
   ]
   const [birthDate, setBirthDate] = useState();
 
-  const registerUser = async ({name,gender,birthDate}) => {
+  const registerUser = async ({name,gender,birthDate, tc_id}) => {
+    const user = JSON.parse(localStorage.getItem('user'))
     try {
       const response = await axios.post('clients', {data: {
         name,
         gender,
-        birth_date: birthDate
+        birth_date: birthDate,
+        therapist: user,
+        tc_id
       }})
 
       if (response) done ()
@@ -37,8 +40,6 @@ function UserForm({done}) {
         // validationSchema={FormSchema}
         onSubmit={(values) => {
           registerUser (values)
-          // const {customerId, password} = values
-          // login (customerId, password)
         }}
       >
         {({ errors }) => (
@@ -71,6 +72,13 @@ function UserForm({done}) {
                 onChange={(date) => setBirthDate(date)}
                 // timeClassName={handleColor}
               />
+              {/* {errors.password && <p>{errors.password}</p>} */}
+            </div>
+            <div className={`${CSS["text-field"]} ${CSS["form-element"]}`}>
+              <label>
+                T.C. Kimlik No.
+              </label>
+                <Field  type="number" name="tc_id" className={CSS["form-field"]} />
               {/* {errors.password && <p>{errors.password}</p>} */}
             </div>
             <button className={CSS["form-submit"]} type="submit">KAYDET</button>

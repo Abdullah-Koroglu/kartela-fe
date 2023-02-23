@@ -19,6 +19,27 @@ moment.locale('tr')
 
 const columns = [
   {
+    id: 'name',
+    label: 'İsim',
+    minWidth: 170,
+    align: 'center',
+    // format: (value) => value.toFixed(2),
+  },
+  {
+    id: 'gender',
+    label: 'Cinsiyet',
+    minWidth: 170,
+    align: 'center',
+    // format: (value) => value.toFixed(2),
+  },
+  {
+    id: 'room',
+    label: 'Oda',
+    minWidth: 170,
+    align: 'center',
+    // format: (value) => value.toFixed(2),
+  },
+  {
     id: 'start_date',
     label: 'Başlangıç',
     minWidth: 170,
@@ -55,9 +76,9 @@ const columns = [
   },
 ];
 
-function createData(start_date, duration, price, is_paid, is_completed) {
+function createData(start_date, duration, price, is_paid, is_completed, name, gender,room) {
 
-  return { start_date, duration, price, is_paid, is_completed };
+  return { start_date, duration, price, is_paid, is_completed, name, gender,room };
 }
 
 
@@ -72,7 +93,7 @@ function SessionList() {
     // client
     // room
     // is_paid
-    // is_complated
+    // is_completed
     const sessions = await axios.get ('sessions?filters&populate=*')
 
     setRows(sessions.data.map ((session) => {
@@ -80,14 +101,16 @@ function SessionList() {
       const startTime = new Date (sessionData.start_time).getTime ()
       const endTime = new Date (sessionData.end_time).getTime ()
       const duration = millisToMinutesAndSeconds(endTime - startTime)
-      // TODO client ve room bilgisi ekle
-      // console.log (sessionData)
+
       return createData(
         moment(startTime).format('MMMM Do YYYY, HH:mm:ss'),
         duration,
         sessionData.price,
         sessionData.is_paid === true ? 'V' : sessionData.is_paid === false ? 'X' : null,
-        sessionData.is_completed === true ? 'V' : sessionData.is_completed === false ? 'X' : null)
+        sessionData.is_completed === true ? 'V' : sessionData.is_completed === false ? 'X' : null,
+        sessionData.client.data.attributes.name,
+        sessionData.client.data.attributes.gender,
+        sessionData.room.data.attributes.name)
       }))
   }
 
@@ -105,10 +128,10 @@ function SessionList() {
     setHeaderContent (
       <>
         <a href="/"><IoArrowBackCircleOutline size={'3rem'} className={CSS["go-back-icon"]}/></a>
-        <h2 className={CSS["page-header"]}>Seans Ekle</h2>
+        <h2 className={CSS["page-header"]}>Seanslarım</h2>
       </>
     )
-  },)
+  },[])
 
   return <div className={CSS["main-container"]}>
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
@@ -131,7 +154,7 @@ function SessionList() {
             {rows
               ?.map((row) => {
                 return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
+                  <TableRow key={row.name} hover role="checkbox" tabIndex={-1}>
                     {columns.map((column) => {
                       const value = row[column.id];
                       return (

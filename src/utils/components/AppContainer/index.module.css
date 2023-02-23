@@ -6,7 +6,7 @@
 }
 
 .app-container {
-  min-width: 500px; /* /TODO WILL DELETE/ */
+  min-width: 500px;
   width: fit-content;
   flex: 1;
   height: 100%;

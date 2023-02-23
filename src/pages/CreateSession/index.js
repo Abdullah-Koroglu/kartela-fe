@@ -18,21 +18,23 @@ import Calendar from "../../utils/components/Calendar";
 function CreateSession() {
   const {setHeaderContent} = useContext (StateContext)
   const navigate = useNavigate ()
-  const [rooms, setRooms] = useState ()
+  const [rooms, setRooms] = useState ([])
+  const [sessionTypes, setSessionTypes] = useState ([])
   const [startDate, setStartDate] = useState ()
-  const [duration, setDuration] = useState (0)
-  const [price, setPrice] = useState (0)
   const [clients, setClients] = useState ()
   const [modalOpen, setModalOpen] = useState ()
   const getFormData = async () => {
+    const user = JSON.parse(localStorage.getItem('user'))
     const rooms = await axios.get ('rooms')
-    const clients = await axios.get ('clients') //TODO sadece benim clientlerimi getir
+    const sessionTypes = await axios.get ('session-types?filters[is_for_event]=false')
+    const clients = await axios.get (`clients?filters[$and][0][therapist][id]=${user.id}&filters[$and][1][active][$ne]=false&populate=*`)
 
+    setSessionTypes (sessionTypes.data)
     setRooms (rooms.data)
     setClients (clients.data)
   }
 
-  const submitSession = async ({client,room,startTime,duration, price}) => {
+  const submitSession = async ({client, room, startTime, duration, price, session_type}) => {
     try {
       const endTime = new Date(startTime.getTime () + (duration * 60000)).getTime ()
 
@@ -41,7 +43,8 @@ function CreateSession() {
         room,
         start_time: startTime.getTime (),
         end_time: endTime,
-        price
+        price,
+        session_type
       }})
       if (response?.error){
         toast.error (response.error?.message ?? 'error')
@@ -152,14 +155,15 @@ function CreateSession() {
               <Field  type="number" name="price" className={CSS["form-field"]} />
             {/* {errors.password && <p>{errors.password}</p>} */}
           </div>
-          {/* <div className={CSS["form-element"]}>
+          <div className={CSS["form-element"]}>
             <label>
-              Kategori
+            Kategori
             </label>
-            <Field className={CSS["form-field"]} as="select" name="room">
-                {rooms?.map (room => <option value={room.id}>{room.attributes.name}</option>)}
+            <Field className={CSS["form-field"]} as="select" name="session_type">
+                <option value={-1}>Seçiniz</option>
+                {sessionTypes?.map (type => <option value={type.id}>{type.attributes.name}</option>)}
             </Field>
-          </div> */}
+          </div>
           <button className={CSS["form-submit"]} type="submit">KAYDET</button>
         </Form>
       )}
