@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import CSS from "./index.module.css"
 
 import Paper from '@mui/material/Paper';
@@ -11,75 +11,84 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import axios from "axios";
 import { millisToMinutesAndSeconds } from "../../utils/services/functions";
+import moment from 'moment'
+import 'moment/locale/tr'  // without this line it didn't work
+import { StateContext } from "../../utils/context/StateContext";
+import { IoArrowBackCircleOutline } from "react-icons/io5";
+moment.locale('tr')
 
 const columns = [
-  { id: 'name', label: 'Name', minWidth: 170 },
-  { id: 'code', label: 'ISO\u00a0Code', minWidth: 100 },
   {
-    id: 'population',
-    label: 'Population',
+    id: 'start_date',
+    label: 'Başlangıç',
     minWidth: 170,
-    align: 'right',
-    format: (value) => value.toLocaleString('en-US'),
+    align: 'center',
+    // format: (value) => value.toFixed(2),
   },
   {
-    id: 'size',
-    label: 'Size\u00a0(km\u00b2)',
+    id: 'duration',
+    label: 'Süre',
     minWidth: 170,
     align: 'right',
-    format: (value) => value.toLocaleString('en-US'),
+    // format: (value) => value.toFixed(2),
   },
   {
-    id: 'density',
-    label: 'Density',
+    id: 'price',
+    label: 'Ücret (₺)',
     minWidth: 170,
-    align: 'right',
-    format: (value) => value.toFixed(2),
+    align: 'center',
+    // format: (value) => value.toFixed(2),
+  },
+  {
+    id: 'is_paid',
+    label: 'Ödendi mi?',
+    minWidth: 170,
+    align: 'center',
+    // format: (value) => value.toFixed(2),
+  },
+  {
+    id: 'is_completed',
+    label: 'Tamamlandı mı?',
+    minWidth: 170,
+    align: 'center',
+    // format: (value) => value.toFixed(2),
   },
 ];
 
-function createData(name, code, population, size) {
-  const density = population / size;
-  return { name, code, population, size, density };
+function createData(start_date, duration, price, is_paid, is_completed) {
+
+  return { start_date, duration, price, is_paid, is_completed };
 }
-
-const rows = [
-  createData('India', 'IN', 1324171354, 3287263),
-  createData('China', 'CN', 1403500365, 9596961),
-  createData('Italy', 'IT', 60483973, 301340),
-  createData('United States', 'US', 327167434, 9833520),
-  createData('Canada', 'CA', 37602103, 9984670),
-  createData('Australia', 'AU', 25475400, 7692024),
-  createData('Germany', 'DE', 83019200, 357578),
-  createData('Ireland', 'IE', 4857000, 70273),
-  createData('Mexico', 'MX', 126577691, 1972550),
-  createData('Japan', 'JP', 126317000, 377973),
-  createData('France', 'FR', 67022000, 640679),
-  createData('United Kingdom', 'GB', 67545757, 242495),
-  createData('Russia', 'RU', 146793744, 17098246),
-  createData('Nigeria', 'NG', 200962417, 923768),
-  createData('Brazil', 'BR', 210147125, 8515767),
-];
 
 
 function SessionList() {
-  // const [rows, setRows] = useState ()
+  const {setHeaderContent} = useContext (StateContext)
+  const [rows, setRows] = useState ([])
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const getSessions = async () => {
-    const sessions = await axios.get ('sessions?filters?populate=*')
+    //TODO filtreleme yap
+    // client
+    // room
+    // is_paid
+    // is_complated
+    const sessions = await axios.get ('sessions?filters&populate=*')
 
-    sessions.data.map ((session) => {
+    setRows(sessions.data.map ((session) => {
       const sessionData = session.attributes
       const startTime = new Date (sessionData.start_time).getTime ()
       const endTime = new Date (sessionData.end_time).getTime ()
-      const duration = millisToMinutesAndSeconds(startTime - endTime)
-      console.log ({
-        startTime: sessionData.start_time,
-        times: {startTime, endTime},
-        duration
-      })})
+      const duration = millisToMinutesAndSeconds(endTime - startTime)
+      // TODO client ve room bilgisi ekle
+      // console.log (sessionData)
+      return createData(
+        moment(startTime).format('MMMM Do YYYY, HH:mm:ss'),
+        duration,
+        sessionData.price,
+        sessionData.is_paid === true ? 'V' : sessionData.is_paid === false ? 'X' : null,
+        sessionData.is_completed === true ? 'V' : sessionData.is_completed === false ? 'X' : null)
+      }))
   }
 
   const handleChangePage = (event, newPage) => {
@@ -93,6 +102,12 @@ function SessionList() {
 
   useEffect (() => {
     getSessions ()
+    setHeaderContent (
+      <>
+        <a href="/"><IoArrowBackCircleOutline size={'3rem'} className={CSS["go-back-icon"]}/></a>
+        <h2 className={CSS["page-header"]}>Seans Ekle</h2>
+      </>
+    )
   },)
 
   return <div className={CSS["main-container"]}>

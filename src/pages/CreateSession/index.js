@@ -26,7 +26,7 @@ function CreateSession() {
   const [modalOpen, setModalOpen] = useState ()
   const getFormData = async () => {
     const rooms = await axios.get ('rooms')
-    const clients = await axios.get ('clients')
+    const clients = await axios.get ('clients') //TODO sadece benim clientlerimi getir
 
     setRooms (rooms.data)
     setClients (clients.data)
@@ -43,7 +43,6 @@ function CreateSession() {
         end_time: endTime,
         price
       }})
-      // console.log (response)
       if (response?.error){
         toast.error (response.error?.message ?? 'error')
         return
@@ -53,7 +52,10 @@ function CreateSession() {
         return
       }
       if (response) {
-        setHeaderContent ()
+        setHeaderContent (<>
+          <a href="/"><IoArrowBackCircleOutline size={'3rem'} className={CSS["go-back-icon"]}/></a>
+          <h2 className={CSS["page-header"]}>Seans Listesi</h2>
+        </>)
         navigate ('/my_sessions')}
 
     } catch (error) {

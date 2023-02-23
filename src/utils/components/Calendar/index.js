@@ -12,42 +12,63 @@ moment.locale('tr')
 
 const Calendar = () => {
   const [sessions, setSessions] = useState ([])
-  const [date, setDate] = useState (new Date(moment().startOf('day')))
+  const [clients, setClients] = useState ([])
+  const [dates, setDates] = useState ([new Date(moment().startOf('day')).getTime (), new Date(moment().startOf('day')).getTime ()])
 
   const getSessions = async () => {
-    const sessions = await axios.get (`sessions?populate=*&sort[0]=start_time&filters[$and][0][start_time][$gte]=${date.getTime ()- 86400000}&filters[$and][1][start_time][$lte]=${date.getTime ()}`)
+    const sessions = await axios.get (`sessions?populate=*&sort[0]=start_time&filters[$and][0][start_time][$gte]=${dates[0]}&filters[$and][1][start_time][$lt]=${dates[1]}`)
+    const clients = await axios.get (`clients?populate=*`)
     const ordered = groupBy (sessions.data , ({attributes}) => attributes.room.data.attributes.color)
-    setSessions (ordered)
+    let newObj = {}
+    Object.keys(ordered).map (key => {
+
+      newObj[key] = groupBy (ordered[key], function ({attributes}) {
+        return moment(attributes.start_time).startOf('day').format('dddd');
+      })
+    })
+
+    setSessions (newObj)
+    setClients (clients.data)
   }
-  useEffect (() => {
-  }, [])
 
   useEffect (() => {
     getSessions ()
-    console.log (date)
-  }, [date] )
+  }, [dates] )
+
   return (
     <div className={CSS["main-container"]}>
-      <ReactCalendar className={CSS["calendar-main"]} onChange={setDate} value={date} />
+      <ReactCalendar
+        locale="tr-TR"
+        className={CSS["calendar-main"]}
+        onChange={(date) => setDates ([date.getTime (), date.getTime () + 86400000])}
+        value={new Date (dates[0])}
+        showWeekNumbers
+        onClickWeekNumber={(weekNumber, date, event) => setDates ([date.getTime (), date.getTime () + (86400000 * 7)])}
+      />
       {
         Object.keys(sessions)?.map (key => {
           const room =  sessions[key]
           return <div key={key} style={{backgroundColor: key}} className={CSS["room-container"]}>
             {
-              room.map (session => {
-                return <div key={session.id} className={CSS["session-container"]}>
-                  { `${session.attributes.client.data.attributes.name} ${moment(session.attributes.start_time).format('HH:mm')} - ${moment(session.attributes.end_time).format('HH:mm')} ---
-                  ${moment(session.attributes.start_time).format('MMMM Do YYYY,  HH:mm')}` }
-                  </div>
+              Object.keys(room).map(day => {
+                return <div className={CSS["day-container"]}>
+                    <span className={CSS["day-name"]}>{day}:</span>
+                    <span className={CSS["program-container"]}>
+                    {room[day].map(session => {
+                      const client = clients.find((client) => client?.id === session.attributes.client?.data?.id)
+                      return <div key={session.id} className={CSS["session-container"]}>
+                        {`${client ? client?.attributes?.therapist?.data?.attributes?.username : 'Etkinlik'} ${dates[1] - dates[0] > 86400001 ? moment(session.attributes.start_time).format('MMMM Do YYYY') : ''} ${moment(session.attributes.start_time).format('HH:mm')} - ${moment(session.attributes.end_time).format('HH:mm')}
+                        ` }
+                      </div>
+                    })}
+                    </span>
+                    </div>
               })
             }
           </div>
-          // room.map (session => {
-          //   console.log ({key, session})
-          // })
-
         })
       }
+      {Object.keys(sessions)?.length === 0 ? 'Bugün için herhangi bir aktivite bulunmamaktadır.': null}
     </div>
   )
 
