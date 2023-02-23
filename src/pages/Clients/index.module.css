@@ -1,0 +1,11 @@
+.page-header {
+  font-weight: 700;
+  font-size: 50px;
+  color: #369CC0;
+}
+
+.go-back-icon {
+  color: #369CC0;
+  padding: .2rem;
+  /* border-radius: 1rem; */
+}

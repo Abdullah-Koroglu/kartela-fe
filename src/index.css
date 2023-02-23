@@ -14,7 +14,7 @@ code {
 }
 
 #root {
-  background-image: url("/public/bg.jpg");
+  /* background-image: url("/public/bg.jpg"); */
   background-repeat: no-repeat;
   background-size: cover;
   flex: 1;

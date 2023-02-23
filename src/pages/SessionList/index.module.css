@@ -9,3 +9,26 @@
   padding: .2rem;
   /* border-radius: 1rem; */
 }
+
+.filter-row {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.filter-element {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #81c9e3;
+  border-radius: 1rem;
+}
+
+.filter-select {
+  border: none;
+  background-color: white;
+  min-width: 5rem;
+  padding: .5rem 1rem;
+  border-radius: .5rem;
+}

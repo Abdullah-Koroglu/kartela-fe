@@ -8,6 +8,7 @@ import CreateSession from "./pages/CreateSession"
 import AppContainer from "./utils/components/AppContainer";
 import ProtectedRoutes from "./utils/components/ProtectedRoutes";
 import Calendar from "./pages/Calendar";
+import Clients from "./pages/Clients";
 
 export default function Router() {
   return (<>
@@ -21,6 +22,7 @@ export default function Router() {
                   <Route path="/calendar" element={<Calendar/>}/>
                   <Route path="/create_session" element={<CreateSession/>}/>
                   <Route path="/my_sessions" element={<SessionList/>}/>
+                  <Route path="/my_clients" element={<Clients/>}/>
               </Route>
           </Routes>
       </BrowserRouter>

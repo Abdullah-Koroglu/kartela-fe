@@ -76,25 +76,57 @@ const columns = [
   },
 ];
 
-function createData(start_date, duration, price, is_paid, is_completed, name, gender,room) {
+function createData(start_date, duration, price, is_paid, is_completed, name, gender,room, id) {
 
-  return { start_date, duration, price, is_paid, is_completed, name, gender,room };
+  return { start_date, duration, price, is_paid, is_completed, name, gender,room, id};
 }
 
 
 function SessionList() {
   const {setHeaderContent} = useContext (StateContext)
   const [rows, setRows] = useState ([])
+  const [clients, setClients] = useState ([])
+  const [rooms, setRooms] = useState ([])
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [filterData, setFilterData] = useState ({
+    client: undefined,
+    room: undefined,
+    is_paid: undefined,
+    is_completed: undefined,
+  })
+
+  const boolSelect = [
+    {value: true, label: 'Evet'},
+    {value: false, label: 'Hayır'},
+    {value: 0, label: 'Boş'},
+  ]
 
   const getSessions = async () => {
-    //TODO filtreleme yap
-    // client
-    // room
-    // is_paid
-    // is_completed
-    const sessions = await axios.get ('sessions?filters&populate=*')
+    const user = JSON.parse(localStorage.getItem('user'))
+    // TODO pagination yap
+    let queryString = `sessions?populate=*&pagination[page]=${page+1}&pagination[pageSize]=${rowsPerPage}&sort[0]=start_time%3Adesc&filters[$and][0][client][therapist][id]=${user.id}`
+    let and = 1
+    if (filterData.client > 0) {
+      queryString = `${queryString}&filters[$and][${and}][client][id]=${filterData.client}`
+    }
+    if (filterData.room > 0) {
+      queryString = `${queryString}&filters[$and][${and}][room][id]=${filterData.room}`
+    }
+    if (filterData.is_paid !== undefined && parseInt (filterData.is_paid) !== -1) {
+      queryString = `${queryString}&filters[$and][${and}][is_paid]${parseInt (filterData.is_paid) !== 0 ? `=${filterData.is_paid}`: `[$null]=true`}`
+    }
+    if (filterData.is_completed !== undefined && parseInt (filterData.is_completed) !== -1 ) {
+      queryString = `${queryString}&filters[$and][${and}][is_completed]${parseInt (filterData.is_completed) !== 0 ? `=${filterData.is_completed}`: `[$null]=true`}`
+    }
+
+
+    const sessions = await axios.get (queryString)
+    const clients = await axios.get (`clients?filters[$and][0][therapist][id]=${user.id}&filters[$and][1][active][$ne]=false&populate=*`)
+    const rooms = await axios.get ('rooms')
+
+    setClients (clients.data)
+    setRooms (rooms.data)
 
     setRows(sessions.data.map ((session) => {
       const sessionData = session.attributes
@@ -110,7 +142,9 @@ function SessionList() {
         sessionData.is_completed === true ? 'V' : sessionData.is_completed === false ? 'X' : null,
         sessionData.client.data.attributes.name,
         sessionData.client.data.attributes.gender,
-        sessionData.room.data.attributes.name)
+        sessionData.room.data.attributes.name,
+        session.id
+        )
       }))
   }
 
@@ -124,7 +158,6 @@ function SessionList() {
   };
 
   useEffect (() => {
-    getSessions ()
     setHeaderContent (
       <>
         <a href="/"><IoArrowBackCircleOutline size={'3rem'} className={CSS["go-back-icon"]}/></a>
@@ -133,7 +166,42 @@ function SessionList() {
     )
   },[])
 
+  useEffect (() => {
+    getSessions ()
+  }, [filterData, rowsPerPage, page])
+
   return <div className={CSS["main-container"]}>
+    <div className={CSS["filter-row"]}>
+      <div className={CSS["filter-element"]}>
+        <span className={CSS["filter-header"]}>Danışan : </span>
+        <select value={filterData.client} onChange={(e) => {setFilterData ((past) => {return {...past, client: e.target.value}})}} className={CSS["filter-select"]}>
+          <option value={-1}>Seçiniz..</option>
+          {clients.map (client => <option value={client.id}>{client.attributes.name}</option>)}
+        </select>
+      </div>
+      <div className={CSS["filter-element"]}>
+        <span className={CSS["filter-header"]}>Oda : </span>
+        <select value={filterData.room} onChange={(e) => {setFilterData ((past) => {return {...past, room: e.target.value}})}} className={CSS["filter-select"]}>
+          <option value={-1}>Seçiniz..</option>
+          {rooms.map (room => <option value={room.id}>{room.attributes.name}</option>)}
+        </select>
+      </div>
+      <div className={CSS["filter-element"]}>
+        <span className={CSS["filter-header"]}>Ödendi mi? : </span>
+        <select value={filterData.is_paid} onChange={(e) => {setFilterData ((past) => {return {...past, is_paid: e.target.value}})}} className={CSS["filter-select"]}>
+          <option value={-1}>Seçiniz..</option>
+          {boolSelect.map (bool => <option value={bool.value}>{bool.label}</option>)}
+        </select>
+      </div>
+      <div className={CSS["filter-element"]}>
+        <span className={CSS["filter-header"]}>Tamamlandı mı? : </span>
+        <select value={filterData.is_completed} onChange={(e) => {setFilterData ((past) => {return {...past, is_completed: e.target.value}})}} className={CSS["filter-select"]}>
+          <option value={-1}>Seçiniz..</option>
+          {boolSelect.map (bool => <option value={bool.value}>{bool.label}</option>)}
+        </select>
+      </div>
+
+    </div>
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
       <TableContainer sx={{ maxHeight: 440 }}>
         <Table stickyHeader aria-label="sticky table">
@@ -154,7 +222,7 @@ function SessionList() {
             {rows
               ?.map((row) => {
                 return (
-                  <TableRow key={row.name} hover role="checkbox" tabIndex={-1}>
+                  <TableRow key={row.id} hover role="checkbox" tabIndex={-1}>
                     {columns.map((column) => {
                       const value = row[column.id];
                       return (
