@@ -46,26 +46,27 @@ const columns = [
 ];
 
 function createData(client) {
-  const {name, gender, tc_id, birth_date} = client.attributes
+  const {name, gender, tc_id, birth_date, id} = client.attributes
   var month_diff = new Date () - new Date (birth_date).getTime ()
   var age_dt = new Date(month_diff);
   var year = age_dt.getUTCFullYear();
   var age = Math.abs(year - 1970);
 
-  return { name, gender, tc_id: tc_id ?? '-', birth_date, age};
+  return { name, gender, tc_id: tc_id ?? '-', birth_date, age, id};
 }
 
 const Clients = () => {
   const {setHeaderContent} = useContext (StateContext)
   const [rows, setRows] = useState ([])
   const [page, setPage] = useState(0);
+  const [count, setCount] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const getClients = async () => {
     const user = JSON.parse(localStorage.getItem('user'))
-    const clients = await axios.get (`clients?filters[$and][0][therapist][id]=${user.id}&filters[$and][1][active][$ne]=false&populate=*`)
+    const clients = await axios.get (`clients?filters[$and][0][therapist][id]=${user.id}&filters[$and][1][active][$ne]=false&populate=*&pagination[page]=${page+1}&pagination[pageSize]=${rowsPerPage}&sort[0]=birth_date`)
+    setCount (clients.meta.pagination.total)
 
-    // setClients (clients.data)
     setRows (clients.data.map (client => createData (client)))
   }
 
@@ -86,7 +87,7 @@ const Clients = () => {
         <h2 className={CSS["page-header"]}>Danışanlarım</h2>
       </>
     )
-  },[setHeaderContent])
+  },[setHeaderContent, page, rowsPerPage])
 
   return <div className={CSS["main-container"]}>
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
@@ -109,7 +110,7 @@ const Clients = () => {
             {rows
               ?.map((row) => {
                 return (
-                  <TableRow key={row.name} hover role="checkbox" tabIndex={-1}>
+                  <TableRow key={row.id} hover role="checkbox" tabIndex={-1}>
                     {columns.map((column) => {
                       const value = row[column.id];
                       return (
@@ -129,7 +130,7 @@ const Clients = () => {
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
-        count={rows.length}
+        count={count}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

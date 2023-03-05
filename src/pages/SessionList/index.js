@@ -14,7 +14,9 @@ import { millisToMinutesAndSeconds } from "../../utils/services/functions";
 import moment from 'moment'
 import 'moment/locale/tr'  // without this line it didn't work
 import { StateContext } from "../../utils/context/StateContext";
-import { IoArrowBackCircleOutline } from "react-icons/io5";
+import { IoArrowBackCircleOutline, IoCloseOutline } from "react-icons/io5";
+import { FaCheck, FaTimes } from "react-icons/fa"
+import { useNavigate } from "react-router-dom";
 moment.locale('tr')
 
 const columns = [
@@ -84,10 +86,12 @@ function createData(start_date, duration, price, is_paid, is_completed, name, ge
 
 function SessionList() {
   const {setHeaderContent} = useContext (StateContext)
+  const navigate = useNavigate ()
   const [rows, setRows] = useState ([])
   const [clients, setClients] = useState ([])
   const [rooms, setRooms] = useState ([])
   const [page, setPage] = useState(0);
+  const [count, setCount] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [filterData, setFilterData] = useState ({
     client: undefined,
@@ -104,7 +108,6 @@ function SessionList() {
 
   const getSessions = async () => {
     const user = JSON.parse(localStorage.getItem('user'))
-    // TODO pagination yap
     let queryString = `sessions?populate=*&pagination[page]=${page+1}&pagination[pageSize]=${rowsPerPage}&sort[0]=start_time%3Adesc&filters[$and][0][client][therapist][id]=${user.id}`
     let and = 1
     if (filterData.client > 0) {
@@ -125,6 +128,8 @@ function SessionList() {
     const clients = await axios.get (`clients?filters[$and][0][therapist][id]=${user.id}&filters[$and][1][active][$ne]=false&populate=*`)
     const rooms = await axios.get ('rooms')
 
+    setCount (sessions.meta.pagination.total)
+
     setClients (clients.data)
     setRooms (rooms.data)
 
@@ -138,8 +143,8 @@ function SessionList() {
         moment(startTime).format('MMMM Do YYYY, HH:mm:ss'),
         duration,
         sessionData.price,
-        sessionData.is_paid === true ? 'V' : sessionData.is_paid === false ? 'X' : null,
-        sessionData.is_completed === true ? 'V' : sessionData.is_completed === false ? 'X' : null,
+        sessionData.is_paid === true ? <FaCheck color="#50C878"/> : sessionData.is_paid === false ? <FaTimes color="#f44336"/> : null,
+        sessionData.is_completed === true ? <FaCheck color="#50C878"/> : sessionData.is_completed === false ? <FaTimes color="#f44336"/> : null,
         sessionData.client.data.attributes.name,
         sessionData.client.data.attributes.gender,
         sessionData.room.data.attributes.name,
@@ -200,7 +205,7 @@ function SessionList() {
           {boolSelect.map (bool => <option key={bool.value} value={bool.value}>{bool.label}</option>)}
         </select>
       </div>
-
+{/* // TODO seans sayfasi yap, seans notlari ekle. */}
     </div>
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
       <TableContainer sx={{ maxHeight: 440 }}>
@@ -222,11 +227,11 @@ function SessionList() {
             {rows
               ?.map((row) => {
                 return (
-                  <TableRow key={row.id} hover role="checkbox" tabIndex={-1}>
+                  <TableRow onClick={() => navigate (`/session/${row.id}`)} key={row.id} hover role="checkbox" tabIndex={-1}>
                     {columns.map((column) => {
                       const value = row[column.id];
                       return (
-                        <TableCell key={column.id} align={column.align}>
+                        <TableCell key={column.id} align={column.align} className={CSS['cursor']}>
                           {column.format && typeof value === 'number'
                             ? column.format(value)
                             : value}
@@ -242,7 +247,7 @@ function SessionList() {
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
-        count={rows.length}
+        count={count}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

@@ -32,3 +32,7 @@
   padding: .5rem 1rem;
   border-radius: .5rem;
 }
+
+.cursor {
+  cursor: pointer;
+}
