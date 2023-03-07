@@ -23,64 +23,71 @@ const columns = [
   {
     id: 'name',
     label: 'İsim',
-    minWidth: 170,
+    // minWidth: 170,
     align: 'center',
     // format: (value) => value.toFixed(2),
   },
   {
     id: 'gender',
     label: 'Cinsiyet',
-    minWidth: 170,
+    // minWidth: 170,
+    align: 'center',
+    // format: (value) => value.toFixed(2),
+  },
+  {
+    id: 'session_type',
+    label: 'Kategori',
+    // minWidth: 170,
     align: 'center',
     // format: (value) => value.toFixed(2),
   },
   {
     id: 'room',
     label: 'Oda',
-    minWidth: 170,
+    // minWidth: 170,
     align: 'center',
     // format: (value) => value.toFixed(2),
   },
   {
     id: 'start_date',
     label: 'Başlangıç',
-    minWidth: 170,
+    // minWidth: 170,
     align: 'center',
     // format: (value) => value.toFixed(2),
   },
   {
     id: 'duration',
     label: 'Süre',
-    minWidth: 170,
+    // minWidth: 170,
     align: 'right',
     // format: (value) => value.toFixed(2),
   },
   {
     id: 'price',
     label: 'Ücret (₺)',
-    minWidth: 170,
+    // minWidth: 170,
     align: 'center',
     // format: (value) => value.toFixed(2),
   },
   {
     id: 'is_paid',
     label: 'Ödendi mi?',
-    minWidth: 170,
+    // minWidth: 170,
     align: 'center',
     // format: (value) => value.toFixed(2),
   },
   {
     id: 'is_completed',
     label: 'Tamamlandı mı?',
-    minWidth: 170,
+    // minWidth: 170,
     align: 'center',
     // format: (value) => value.toFixed(2),
   },
 ];
 
-function createData(start_date, duration, price, is_paid, is_completed, name, gender,room, id) {
+function createData(start_date, duration, price, is_paid, is_completed, name, gender,room, id, session_type) {
 
-  return { start_date, duration, price, is_paid, is_completed, name, gender,room, id};
+  return { start_date, duration, price, is_paid, is_completed, name, gender,room, id, session_type};
 }
 
 
@@ -89,6 +96,7 @@ function SessionList() {
   const navigate = useNavigate ()
   const [rows, setRows] = useState ([])
   const [clients, setClients] = useState ([])
+  const [sessionTypes, setSessionTypes] = useState ([])
   const [rooms, setRooms] = useState ([])
   const [page, setPage] = useState(0);
   const [count, setCount] = useState(0);
@@ -98,6 +106,7 @@ function SessionList() {
     room: undefined,
     is_paid: undefined,
     is_completed: undefined,
+    session_type: undefined,
   })
 
   const boolSelect = [
@@ -116,6 +125,9 @@ function SessionList() {
     if (filterData.room > 0) {
       queryString = `${queryString}&filters[$and][${and}][room][id]=${filterData.room}`
     }
+    if (filterData.session_type > 0) {
+      queryString = `${queryString}&filters[$and][${and}][session_type][id]=${filterData.session_type}`
+    }
     if (filterData.is_paid !== undefined && parseInt (filterData.is_paid) !== -1) {
       queryString = `${queryString}&filters[$and][${and}][is_paid]${parseInt (filterData.is_paid) !== 0 ? `=${filterData.is_paid}`: `[$null]=true`}`
     }
@@ -127,11 +139,13 @@ function SessionList() {
     const sessions = await axios.get (queryString)
     const clients = await axios.get (`clients?filters[$and][0][therapist][id]=${user.id}&filters[$and][1][active][$ne]=false&populate=*`)
     const rooms = await axios.get ('rooms')
+    const session_types = await axios.get ('session-types?filters[is_for_event]=false')
 
     setCount (sessions.meta.pagination.total)
 
     setClients (clients.data)
     setRooms (rooms.data)
+    setSessionTypes (session_types.data)
 
     setRows(sessions.data.map ((session) => {
       const sessionData = session.attributes
@@ -148,7 +162,8 @@ function SessionList() {
         sessionData.client.data.attributes.name,
         sessionData.client.data.attributes.gender,
         sessionData.room.data.attributes.name,
-        session.id
+        session.id,
+        sessionData.session_type?.data?.attributes?.name
         )
       }))
   }
@@ -179,28 +194,35 @@ function SessionList() {
     <div className={CSS["filter-row"]}>
       <div className={CSS["filter-element"]}>
         <span className={CSS["filter-header"]}>Danışan : </span>
-        <select value={filterData.client} onChange={(e) => {setFilterData ((past) => {return {...past, client: e.target.value}})}} className={CSS["filter-select"]}>
+        <select value={filterData.client} onChange={(e) => {setPage(0); setFilterData ((past) => {return {...past, client: e.target.value}})}} className={CSS["filter-select"]}>
           <option value={-1}>Seçiniz..</option>
           {clients.map (client => <option key={client.id} value={client.id}>{client.attributes.name}</option>)}
         </select>
       </div>
       <div className={CSS["filter-element"]}>
+        <span className={CSS["filter-header"]}>Kategori : </span>
+        <select value={filterData.session_type} onChange={(e) => {setPage(0); setFilterData ((past) => {return {...past, session_type: e.target.value}})}} className={CSS["filter-select"]}>
+          <option value={-1}>Seçiniz..</option>
+          {sessionTypes.map (type => <option key={type.id} value={type.id}>{type.attributes.name}</option>)}
+        </select>
+      </div>
+      <div className={CSS["filter-element"]}>
         <span className={CSS["filter-header"]}>Oda : </span>
-        <select value={filterData.room} onChange={(e) => {setFilterData ((past) => {return {...past, room: e.target.value}})}} className={CSS["filter-select"]}>
+        <select value={filterData.room} onChange={(e) => {setPage(0); setFilterData ((past) => {return {...past, room: e.target.value}})}} className={CSS["filter-select"]}>
           <option value={-1}>Seçiniz..</option>
           {rooms.map (room => <option key={room.id} value={room.id}>{room.attributes.name}</option>)}
         </select>
       </div>
       <div className={CSS["filter-element"]}>
         <span className={CSS["filter-header"]}>Ödendi mi? : </span>
-        <select value={filterData.is_paid} onChange={(e) => {setFilterData ((past) => {return {...past, is_paid: e.target.value}})}} className={CSS["filter-select"]}>
+        <select value={filterData.is_paid} onChange={(e) => {setPage(0); setFilterData ((past) => {return {...past, is_paid: e.target.value}})}} className={CSS["filter-select"]}>
           <option value={-1}>Seçiniz..</option>
           {boolSelect.map (bool => <option key={bool.value} value={bool.value}>{bool.label}</option>)}
         </select>
       </div>
       <div className={CSS["filter-element"]}>
         <span className={CSS["filter-header"]}>Tamamlandı mı? : </span>
-        <select value={filterData.is_completed} onChange={(e) => {setFilterData ((past) => {return {...past, is_completed: e.target.value}})}} className={CSS["filter-select"]}>
+        <select value={filterData.is_completed} onChange={(e) => {setPage(0); setFilterData ((past) => {return {...past, is_completed: e.target.value}})}} className={CSS["filter-select"]}>
           <option value={-1}>Seçiniz..</option>
           {boolSelect.map (bool => <option key={bool.value} value={bool.value}>{bool.label}</option>)}
         </select>
